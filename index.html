@@ -51,7 +51,6 @@
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
 
-        /* The '?' side */
         .card::before {
             content: '?';
             font-size: 2rem;
@@ -60,13 +59,12 @@
             backface-visibility: hidden;
         }
 
-        /* The Image side */
         .card img {
             width: 100%;
             height: 100%;
             border-radius: 12px;
             object-fit: cover;
-            display: none; /* Hidden until flipped */
+            display: none;
         }
 
         .card.flipped {
@@ -88,7 +86,6 @@
             pointer-events: none;
         }
 
-        /* Note Overlay */
         #note-overlay {
             display: none;
             position: fixed;
@@ -122,14 +119,21 @@
             border-radius: 25px;
             cursor: pointer;
             margin-top: 20px;
+            font-size: 1rem;
+        }
+
+        button:hover {
+            background-color: #f94d7a;
         }
     </style>
 </head>
 <body>
 
-    <h1>Mother's Day Memory Match</h1>
-    <p>Match the photos to see your surprise!</p>
+    <h1>Happy Mother's Day</h1>
+    <p>Hey Mom, it's Ben! Find 8 matches to read your card.</p>
     
+    <audio id="bg-music" src="mother.mp3" loop></audio>
+
     <div class="game-container" id="game-board"></div>
 
     <button onclick="resetGame()">Restart Game</button>
@@ -139,15 +143,14 @@
             <h2>To the Best Mom Ever ❤️</h2>
             <p>
                 Happy Mother's Day! <br><br>
-                Thank you for all the wonderful memories. <br>
-                I hope you enjoyed seeing these photos!
+                I just want you to know how much we appreciate you. <br>
+                I hope you enjoyed seeing these photos! Thankyou for everything you do!
             </p>
             <button onclick="closeNote()">Play Again</button>
         </div>
     </div>
 
     <script>
-        // Array of image paths (image1.jpg to image8.jpg)
         const imageFiles = [
             'images/image1.jpg', 'images/image2.jpg', 'images/image3.jpg', 'images/image4.jpg',
             'images/image5.jpg', 'images/image6.jpg', 'images/image7.jpg', 'images/image8.jpg'
@@ -156,6 +159,7 @@
         let cards = [...imageFiles, ...imageFiles];
         let flippedCards = [];
         let matchedCount = 0;
+        let musicStarted = false;
 
         function shuffle(array) {
             return array.sort(() => Math.random() - 0.5);
@@ -179,6 +183,12 @@
         }
 
         function flipCard() {
+            if (!musicStarted) {
+                const music = document.getElementById('bg-music');
+                music.play().catch(error => console.log("Audio play failed:", error));
+                musicStarted = true;
+            }
+
             if (flippedCards.length < 2 && !this.classList.contains('flipped')) {
                 this.classList.add('flipped');
                 flippedCards.push(this);
@@ -208,9 +218,24 @@
             }
         }
 
-        function showNote() { document.getElementById('note-overlay').style.display = 'flex'; }
-        function closeNote() { document.getElementById('note-overlay').style.display = 'none'; resetGame(); }
-        function resetGame() { matchedCount = 0; flippedCards = []; createBoard(); }
+        function showNote() { 
+            const music = document.getElementById('bg-music');
+            music.pause(); // Stop the music when the win overlay appears
+            music.currentTime = 0; // Reset music to the beginning
+            document.getElementById('note-overlay').style.display = 'flex'; 
+        }
+
+        function closeNote() { 
+            document.getElementById('note-overlay').style.display = 'none'; 
+            resetGame(); 
+        }
+
+        function resetGame() { 
+            matchedCount = 0; 
+            flippedCards = []; 
+            musicStarted = false; // Reset so music can start again on the next click
+            createBoard(); 
+        }
 
         createBoard();
     </script>
